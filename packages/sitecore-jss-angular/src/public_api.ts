@@ -4,9 +4,20 @@ export { LinkDirective } from './components/link.directive';
 export { RouterLinkDirective } from './components/router-link.directive';
 export { GenericLinkDirective } from './components/generic-link.directive';
 export { PlaceholderComponent } from './components/placeholder.component';
-export { ComponentNameAndType, DYNAMIC_COMPONENT } from './components/placeholder.token';
+export {
+  ComponentNameAndType,
+  DYNAMIC_COMPONENT,
+  ComponentNameAndModule,
+} from './components/placeholder.token';
 export { isRawRendering } from './components/rendering';
-export { FileField, ImageField, LinkField, RenderingField, RichTextField, TextField } from './components/rendering-field';
+export {
+  FileField,
+  ImageField,
+  LinkField,
+  RenderingField,
+  RichTextField,
+  TextField,
+} from './components/rendering-field';
 export { RichTextDirective } from './components/rich-text.directive';
 export { TextDirective } from './components/text.directive';
 export { LayoutService } from './layout.service';
@@ -30,5 +41,5 @@ export {
   ComponentParams,
   HttpJsonFetcher,
   HttpResponse,
-  isServer
+  isServer,
 } from '@sitecore-jss/sitecore-jss';
