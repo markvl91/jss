@@ -44,7 +44,8 @@ export interface FactoryWithData {
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
   template: `
-    <ng-template #view></ng-template><ng-template *ngIf="isLoading" [ngTemplateOutlet]="placeholderLoading?.templateRef"></ng-template>
+    <ng-template *ngIf="isLoading" [ngTemplateOutlet]="placeholderLoading?.templateRef"></ng-template>
+    <ng-template #view></ng-template>
   `,
 })
 export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
@@ -69,7 +70,7 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
   @ViewChild('view', { read: ViewContainerRef }) private view: ViewContainerRef;
   @ContentChild(RenderEachDirective) renderEachTemplate: RenderEachDirective;
   @ContentChild(RenderEmptyDirective) renderEmptyTemplate: RenderEmptyDirective;
-  @ContentChild(PlaceholderLoadingDirective) placeholderLoading: PlaceholderLoadingDirective;
+  @ContentChild(PlaceholderLoadingDirective) placeholderLoading?: PlaceholderLoadingDirective;
 
   @Input()
   set inputs(value: { [key: string]: any }) {
