@@ -22,10 +22,8 @@ import { ActivatedRoute, Data, Router } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
 import { Observable, of } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
-import {
-  ComponentFactoryResult,
-  JssComponentFactoryService,
-} from '../jss-component-factory.service';
+import { ComponentFactoryResult, JssComponentFactoryService } from '../jss-component-factory.service';
+import { PlaceholderLoadingDirective } from './placeholder-loading.directive';
 import { PLACEHOLDER_MISSING_COMPONENT_COMPONENT } from './placeholder.token';
 import { RenderEachDirective } from './render-each.directive';
 import { RenderEmptyDirective } from './render-empty.directive';
@@ -46,7 +44,7 @@ export interface FactoryWithData {
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
   template: `
-    <ng-template #view></ng-template><ng-content *ngIf="isLoading"></ng-content>
+    <ng-template #view></ng-template><ng-template *ngIf="isLoading" [ngTemplateOutlet]="placeholderLoading?.templateRef"></ng-template>
   `,
 })
 export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
@@ -68,12 +66,10 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
   @Output()
   loaded = new EventEmitter<string | undefined>();
 
-  @ViewChild('view', { read: ViewContainerRef })
-  private view: ViewContainerRef;
-  @ContentChild(RenderEachDirective)
-  renderEachTemplate: RenderEachDirective;
-  @ContentChild(RenderEmptyDirective)
-  renderEmptyTemplate: RenderEmptyDirective;
+  @ViewChild('view', { read: ViewContainerRef }) private view: ViewContainerRef;
+  @ContentChild(RenderEachDirective) renderEachTemplate: RenderEachDirective;
+  @ContentChild(RenderEmptyDirective) renderEmptyTemplate: RenderEmptyDirective;
+  @ContentChild(PlaceholderLoadingDirective) placeholderLoading: PlaceholderLoadingDirective;
 
   @Input()
   set inputs(value: { [key: string]: any }) {
