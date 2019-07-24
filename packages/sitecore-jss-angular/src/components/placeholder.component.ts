@@ -46,7 +46,7 @@ export interface FactoryWithData {
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
   template: `
-    <ng-template #view></ng-template>
+    <ng-template #view></ng-template><ng-content *ngIf="isLoading"></ng-content>
   `,
 })
 export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
@@ -54,6 +54,7 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
   private _differ: KeyValueDiffer<string, any>;
   private _componentInstances: any[] = [];
   private destroyed = false;
+  public isLoading = true;
 
   @Input()
   name?: string;
@@ -151,19 +152,16 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
 
     if (!this.name && !this.renderings) {
       // tslint:disable-next-line:max-line-length
-      console.warn(
-        `Placeholder name was not specified, and explicit renderings array was not passed. Placeholder requires either name and rendering, or renderings.`
-      );
+      console.warn(`Placeholder name was not specified, and explicit renderings array was not passed. Placeholder requires either name and rendering, or renderings.`);
+      this.isLoading = false;
       return;
     }
 
     const placeholder = this.renderings || getPlaceholder(this.rendering, this.name || '');
 
     if (!placeholder) {
-      console.warn(
-        `Placeholder '${this.name}' was not found in the current rendering data`,
-        JSON.stringify(this.rendering, null, 2)
-      );
+      console.warn(`Placeholder '${this.name}' was not found in the current rendering data`, JSON.stringify(this.rendering, null, 2));
+      this.isLoading = false;
       return;
     }
 
@@ -176,6 +174,7 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
       this.view.createEmbeddedView(this.renderEmptyTemplate.templateRef, {
         renderings: placeholder,
       });
+      this.isLoading = false;
     } else {
       const factories = await this.componentFactory.getComponents(placeholder);
       const nonGuarded = await this._resolveGuards(factories);
@@ -187,6 +186,7 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
         } else {
           this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
         }
+        this.isLoading = false;
       });
 
       this.changeDetectorRef.markForCheck();
