@@ -43,10 +43,6 @@ export interface FactoryWithData {
   data?: Data;
 }
 
-const isObservableOrPromise = (val: any): val is Promise<unknown> | Observable<unknown> => {
-  return val instanceof Promise || val instanceof Observable;
-};
-
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
   template: `
