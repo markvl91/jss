@@ -255,7 +255,12 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
           this.router.routerState.snapshot
         );
 
-        const canActivate$ = isObservableOrPromise(guardValue) ? from(guardValue) : of(guardValue);
+        const canActivate$ =
+          guardValue instanceof Promise
+            ? from(guardValue)
+            : guardValue instanceof Observable
+              ? guardValue
+              : of(guardValue);
 
         const canActivate = await canActivate$.pipe(take(1)).toPromise();
         return { factory, canActivate };
@@ -283,9 +288,12 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
           this.router.routerState.snapshot
         );
 
-        const data$ = isObservableOrPromise(resolvedValue)
-          ? from<unknown>(resolvedValue)
-          : of<unknown>(resolvedValue);
+        const data$ =
+          resolvedValue instanceof Promise
+            ? from<unknown>(resolvedValue)
+            : resolvedValue instanceof Observable
+              ? resolvedValue
+              : of<unknown>(resolvedValue);
 
         const data = await data$.pipe(take(1)).toPromise();
 
