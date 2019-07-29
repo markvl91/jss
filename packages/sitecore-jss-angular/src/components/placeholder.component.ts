@@ -20,9 +20,12 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
-import { Observable, of } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
-import { ComponentFactoryResult, JssComponentFactoryService } from '../jss-component-factory.service';
+import { from, Observable, of } from 'rxjs';
+import { take, takeWhile } from 'rxjs/operators';
+import {
+  ComponentFactoryResult,
+  JssComponentFactoryService,
+} from '../jss-component-factory.service';
 import { PlaceholderLoadingDirective } from './placeholder-loading.directive';
 import { PLACEHOLDER_MISSING_COMPONENT_COMPONENT } from './placeholder.token';
 import { RenderEachDirective } from './render-each.directive';
@@ -40,6 +43,10 @@ export interface FactoryWithData {
   factory: ComponentFactoryResult;
   data?: Data;
 }
+
+const isObservableOrPromise = (val: any): val is Promise<unknown> | Observable<unknown> => {
+  return val instanceof Promise || val instanceof Observable;
+};
 
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
@@ -242,11 +249,15 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
           'canActivate' in factory.canActivate
             ? factory.canActivate
             : this.injector.get(factory.canActivate);
-        const canActivate$ = of(
-          guard.canActivate(this.activatedRoute.snapshot, this.router.routerState.snapshot)
+
+        const guardValue = guard.canActivate(
+          this.activatedRoute.snapshot,
+          this.router.routerState.snapshot
         );
 
-        const canActivate = await canActivate$.toPromise();
+        const canActivate$ = isObservableOrPromise(guardValue) ? from(guardValue) : of(guardValue);
+
+        const canActivate = await canActivate$.pipe(take(1)).toPromise();
         return { factory, canActivate };
       }
 
@@ -266,10 +277,17 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
       if (factory.resolve != null) {
         const resolver =
           'resolve' in factory.resolve ? factory.resolve : this.injector.get(factory.resolve);
-        const data$ = of(
-          resolver.resolve(this.activatedRoute.snapshot, this.router.routerState.snapshot)
+
+        const resolvedValue = resolver.resolve(
+          this.activatedRoute.snapshot,
+          this.router.routerState.snapshot
         );
-        const data = await data$.toPromise();
+
+        const data$ = isObservableOrPromise(resolvedValue)
+          ? from<unknown>(resolvedValue)
+          : of<unknown>(resolvedValue);
+
+        const data = await data$.pipe(take(1)).toPromise();
 
         return {
           factory,
