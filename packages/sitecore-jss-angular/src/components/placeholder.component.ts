@@ -190,9 +190,9 @@ export class PlaceholderComponent implements OnChanges, DoCheck, OnDestroy {
         } else {
           this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
         }
-        this.isLoading = false;
       });
 
+      this.isLoading = false;
       this.changeDetectorRef.markForCheck();
       this.loaded.emit(this.name);
     }
