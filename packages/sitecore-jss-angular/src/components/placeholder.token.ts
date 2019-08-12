@@ -1,4 +1,4 @@
-import { InjectionToken, Type } from '@angular/core';
+import { InjectionToken, Type, NgModuleFactory } from '@angular/core';
 import { CanActivate, Resolve } from '@angular/router';
 
 /** Registers a statically loaded component */
@@ -18,7 +18,7 @@ export interface ComponentNameAndModule {
    * Module path that defines the component and export name,
    * e.g. ./path/to/lazyloadedcomponent.module#LazyLoadedComponentModuleExportName
    */
-  loadChildren: string;
+  loadChildren: (() => Promise<NgModuleFactory<any>>) | string;
   canActivate?: CanActivate | Type<CanActivate>;
   resolve?: Resolve<unknown> | Type<Resolve<unknown>>;
 }
