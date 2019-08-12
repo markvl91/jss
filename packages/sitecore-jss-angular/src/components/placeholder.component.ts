@@ -47,10 +47,6 @@ export interface FactoryWithData {
   data?: Data;
 }
 
-const isObservableOrPromise = (val: any): val is Promise<unknown> | Observable<unknown> => {
-  return val instanceof Promise || val instanceof Observable;
-};
-
 @Component({
   selector: 'sc-placeholder,[sc-placeholder]',
   template: `
@@ -283,7 +279,12 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
           this.router.routerState.snapshot
         );
 
-        const canActivate$ = isObservableOrPromise(guardValue) ? from(guardValue) : of(guardValue);
+        const canActivate$ =
+          guardValue instanceof Promise
+            ? from(guardValue)
+            : guardValue instanceof Observable
+              ? guardValue
+              : of(guardValue);
 
         const canActivate = await canActivate$.pipe(take(1)).toPromise();
         return { factory, canActivate };
@@ -311,9 +312,12 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
           this.router.routerState.snapshot
         );
 
-        const data$ = isObservableOrPromise(resolvedValue)
-          ? from<unknown>(resolvedValue)
-          : of<unknown>(resolvedValue);
+        const data$ =
+          resolvedValue instanceof Promise
+            ? from<unknown>(resolvedValue)
+            : resolvedValue instanceof Observable
+              ? resolvedValue
+              : of<unknown>(resolvedValue);
 
         const data = await data$.pipe(take(1)).toPromise();
 
