@@ -314,7 +314,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
 
         const data$ =
           resolvedValue instanceof Promise
-            ? from<unknown>(resolvedValue)
+            ? from(resolvedValue) as Observable<unknown>
             : resolvedValue instanceof Observable
               ? resolvedValue
               : of<unknown>(resolvedValue);
