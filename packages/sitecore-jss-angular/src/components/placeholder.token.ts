@@ -1,13 +1,13 @@
 import { InjectionToken, Type } from '@angular/core';
-import { LoadChildren, CanActivate, Resolve } from '@angular/router';
+import { CanActivate, LoadChildren } from '@angular/router';
+import { ComponentFactoryResult } from '../jss-component-factory.service';
 
 /** Registers a statically loaded component */
 export class ComponentNameAndType {
   name: string;
   type: Type<any>;
 
-  canActivate?: CanActivate | Type<CanActivate>;
-  resolve?: Resolve<unknown> | Type<Resolve<unknown>>;
+  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
 }
 
 /** Registers a lazily loaded component by name and module to lazy load when it's needed */
@@ -19,8 +19,7 @@ export interface ComponentNameAndModule {
    * e.g. ./path/to/lazyloadedcomponent.module#LazyLoadedComponentModuleExportName
    */
   loadChildren: LoadChildren;
-  canActivate?: CanActivate | Type<CanActivate>;
-  resolve?: Resolve<unknown> | Type<Resolve<unknown>>;
+  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
 }
 
 export function instanceOfComponentNameAndType(object: any): object is ComponentNameAndType {
@@ -43,3 +42,7 @@ export const PLACEHOLDER_MISSING_COMPONENT_COMPONENT = new InjectionToken<Type<a
 export const DYNAMIC_COMPONENT = new InjectionToken<Type<any> | { [s: string]: any }>(
   'Sc.placeholder.dynamicComponent'
 );
+
+export type GuardResolver = (result: ComponentFactoryResult[]) => Promise<ComponentFactoryResult[]>;
+
+export const GUARD_RESOLVER = new InjectionToken<GuardResolver>('Sc.placeholder.guardResolver');

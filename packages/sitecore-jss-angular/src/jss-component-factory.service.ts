@@ -1,17 +1,17 @@
 import {
+  Compiler,
   ComponentFactory,
   Inject,
   Injectable,
   Injector,
+  NgModuleFactory,
   NgModuleFactoryLoader,
   Type,
-  NgModuleFactory,
-  Compiler,
-  ɵisObservable as isObservable,
-  ɵisPromise as isPromise
 } from '@angular/core';
-import { CanActivate, Resolve, LoadChildren } from '@angular/router';
+import { CanActivate, LoadChildren } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
+import { from, of } from 'rxjs';
+import { mergeMap, take } from 'rxjs/operators';
 import {
   ComponentNameAndModule,
   ComponentNameAndType,
@@ -21,15 +21,13 @@ import {
 } from './components/placeholder.token';
 import { RawComponent } from './components/raw.component';
 import { isRawRendering } from './components/rendering';
-import { Observable, from, of } from 'rxjs';
-import { mergeMap, take } from 'rxjs/operators';
+import { wrapIntoObservable } from './utils';
 
 export interface ComponentFactoryResult {
   componentImplementation?: Type<any>;
   componentDefinition: ComponentRendering | HtmlElementRendering;
   componentFactory?: ComponentFactory<any>;
-  canActivate?: CanActivate | Type<CanActivate>;
-  resolve?: Resolve<unknown> | Type<Resolve<unknown>>;
+  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
 }
 
 @Injectable()
@@ -62,7 +60,6 @@ export class JssComponentFactoryService {
         componentDefinition: component,
         componentImplementation: loadedComponent.type,
         canActivate: loadedComponent.canActivate,
-        resolve: loadedComponent.resolve,
       });
     }
 
@@ -104,7 +101,6 @@ export class JssComponentFactoryService {
             componentType
           ),
           canActivate: lazyComponent.canActivate,
-          resolve: lazyComponent.resolve,
         };
       });
     }
@@ -118,26 +114,19 @@ export class JssComponentFactoryService {
     if (typeof loadChildren === 'string') {
       return this.loader.load(loadChildren);
     } else {
-      return this.wrapIntoObservable(loadChildren()).pipe(mergeMap((t: any) => {
-        if (t instanceof NgModuleFactory) {
-          return of (t);
-        } else {
-          return from(this.compiler.compileModuleAsync(t));
-        }
-      }), take(1)).toPromise();
+      return wrapIntoObservable(loadChildren())
+        .pipe(
+          mergeMap((t: any) => {
+            if (t instanceof NgModuleFactory) {
+              return of(t);
+            } else {
+              return from(this.compiler.compileModuleAsync(t));
+            }
+          }),
+          take(1)
+        )
+        .toPromise();
     }
-  }
-
-  private wrapIntoObservable<T>(value: T | Promise<T>| Observable<T>): Observable<T> {
-    if (isObservable(value)) {
-      return value;
-    }
-  
-    if (isPromise(value)) {
-      return from(Promise.resolve(value));
-    }
-  
-    return of (value);
   }
 
   getComponents(

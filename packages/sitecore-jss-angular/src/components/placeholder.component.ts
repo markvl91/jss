@@ -7,7 +7,6 @@ import {
   ElementRef,
   EventEmitter,
   Inject,
-  Injector,
   Input,
   KeyValueDiffer,
   KeyValueDiffers,
@@ -21,16 +20,20 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { ActivatedRoute, Data, Router } from '@angular/router';
+import { Data } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
-import { from, Observable, of } from 'rxjs';
-import { take, takeWhile } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import {
   ComponentFactoryResult,
   JssComponentFactoryService,
 } from '../jss-component-factory.service';
 import { PlaceholderLoadingDirective } from './placeholder-loading.directive';
-import { PLACEHOLDER_MISSING_COMPONENT_COMPONENT } from './placeholder.token';
+import {
+  GUARD_RESOLVER,
+  GuardResolver,
+  PLACEHOLDER_MISSING_COMPONENT_COMPONENT,
+} from './placeholder.token';
 import { RenderEachDirective } from './render-each.directive';
 import { RenderEmptyDirective } from './render-empty.directive';
 import { isRawRendering } from './rendering';
@@ -59,7 +62,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   private _differ: KeyValueDiffer<string, any>;
   private _componentInstances: any[] = [];
   private destroyed = false;
-  private parentStyleAttribute: string = '';
+  private parentStyleAttribute = '';
   public isLoading = true;
 
   @Input()
@@ -74,10 +77,14 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   @Output()
   loaded = new EventEmitter<string | undefined>();
 
-  @ViewChild('view', { read: ViewContainerRef, static: true }) private view: ViewContainerRef;
-  @ContentChild(RenderEachDirective, {static: false}) renderEachTemplate: RenderEachDirective;
-  @ContentChild(RenderEmptyDirective, {static: false}) renderEmptyTemplate: RenderEmptyDirective;
-  @ContentChild(PlaceholderLoadingDirective, {static: false}) placeholderLoading?: PlaceholderLoadingDirective;
+  @ViewChild('view', { read: ViewContainerRef })
+  private view: ViewContainerRef;
+  @ContentChild(RenderEachDirective)
+  renderEachTemplate: RenderEachDirective;
+  @ContentChild(RenderEmptyDirective)
+  renderEmptyTemplate: RenderEmptyDirective;
+  @ContentChild(PlaceholderLoadingDirective)
+  placeholderLoading?: PlaceholderLoadingDirective;
 
   @Input()
   set inputs(value: { [key: string]: any }) {
@@ -92,12 +99,10 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     private differs: KeyValueDiffers,
     private componentFactory: JssComponentFactoryService,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private injector: Injector,
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    @Inject(PLACEHOLDER_MISSING_COMPONENT_COMPONENT) private missingComponentComponent: Type<any>
+    @Inject(PLACEHOLDER_MISSING_COMPONENT_COMPONENT) private missingComponentComponent: Type<any>,
+    @Inject(GUARD_RESOLVER) private guardResolver: GuardResolver
   ) {}
 
   ngOnInit() {
@@ -109,7 +114,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
       for (let i = 0; i < attributes.length; i++) {
         const attr: Attr | null = attributes.item(i);
         if (attr && attr.name.indexOf('_ngcontent') !== -1) {
-            this.parentStyleAttribute = attr.name;
+          this.parentStyleAttribute = attr.name;
         }
       }
     }
@@ -173,7 +178,9 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
 
     if (!this.name && !this.renderings) {
       // tslint:disable-next-line:max-line-length
-      console.warn(`Placeholder name was not specified, and explicit renderings array was not passed. Placeholder requires either name and rendering, or renderings.`);
+      console.warn(
+        `Placeholder name was not specified, and explicit renderings array was not passed. Placeholder requires either name and rendering, or renderings.`
+      );
       this.isLoading = false;
       return;
     }
@@ -181,7 +188,10 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     const placeholder = this.renderings || getPlaceholder(this.rendering, this.name || '');
 
     if (!placeholder) {
-      console.warn(`Placeholder '${this.name}' was not found in the current rendering data`, JSON.stringify(this.rendering, null, 2));
+      console.warn(
+        `Placeholder '${this.name}' was not found in the current rendering data`,
+        JSON.stringify(this.rendering, null, 2)
+      );
       this.isLoading = false;
       return;
     }
@@ -198,14 +208,13 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
       this.isLoading = false;
     } else {
       const factories = await this.componentFactory.getComponents(placeholder);
-      const nonGuarded = await this._resolveGuards(factories);
-      const withData = await this._resolveData(nonGuarded);
+      const nonGuarded = await this.guardResolver(factories);
 
-      withData.forEach((rendering, index) => {
-        if (this.renderEachTemplate && !isRawRendering(rendering.factory.componentDefinition)) {
-          this._renderTemplatedComponent(rendering.factory.componentDefinition, index);
+      nonGuarded.forEach((factory, index) => {
+        if (this.renderEachTemplate && !isRawRendering(factory.componentDefinition)) {
+          this._renderTemplatedComponent(factory.componentDefinition, index);
         } else {
-          this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
+          this._renderEmbeddedComponent(factory, index);
         }
       });
 
@@ -228,7 +237,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     });
   }
 
-  private _renderEmbeddedComponent(rendering: ComponentFactoryResult, data: any, index: number) {
+  private _renderEmbeddedComponent(rendering: ComponentFactoryResult, index: number) {
     if (!rendering.componentImplementation) {
       const componentName = (rendering.componentDefinition as ComponentRendering).componentName;
       console.error(
@@ -250,12 +259,15 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     // work-around for https://github.com/angular/angular/issues/12215
     const createdComponentRef = this.view.createComponent(componentFactory, index);
     if (this.parentStyleAttribute) {
-      this.renderer.setAttribute(createdComponentRef.location.nativeElement, this.parentStyleAttribute, '');
+      this.renderer.setAttribute(
+        createdComponentRef.location.nativeElement,
+        this.parentStyleAttribute,
+        ''
+      );
     }
 
     const componentInstance = createdComponentRef.instance;
     componentInstance.rendering = rendering.componentDefinition;
-    componentInstance.data = data;
 
     if (this._inputs) {
       this._setComponentInputs(componentInstance, this._inputs);
@@ -264,72 +276,5 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
       this._subscribeComponentOutputs(componentInstance, this.outputs);
     }
     this._componentInstances.push(componentInstance);
-  }
-
-  private _resolveGuards(results: ComponentFactoryResult[]) {
-    const resolved = results.map(async (factory) => {
-      if (factory.canActivate != null) {
-        const guard =
-          'canActivate' in factory.canActivate
-            ? factory.canActivate
-            : this.injector.get(factory.canActivate);
-
-        const guardValue = guard.canActivate(
-          this.activatedRoute.snapshot,
-          this.router.routerState.snapshot
-        );
-
-        const canActivate$ =
-          guardValue instanceof Promise
-            ? from(guardValue)
-            : guardValue instanceof Observable
-              ? guardValue
-              : of(guardValue);
-
-        const canActivate = await canActivate$.pipe(take(1)).toPromise();
-        return { factory, canActivate };
-      }
-
-      return {
-        factory,
-        canActivate: true,
-      };
-    });
-
-    return Promise.all(resolved).then((mapped) =>
-      mapped.filter((m) => m.canActivate).map((m) => m.factory)
-    );
-  }
-
-  private _resolveData(factories: ComponentFactoryResult[]) {
-    const resolved = factories.map(async (factory) => {
-      if (factory.resolve != null) {
-        const resolver =
-          'resolve' in factory.resolve ? factory.resolve : this.injector.get(factory.resolve);
-
-        const resolvedValue = resolver.resolve(
-          this.activatedRoute.snapshot,
-          this.router.routerState.snapshot
-        );
-
-        const data$ =
-          resolvedValue instanceof Promise
-            ? from(resolvedValue) as Observable<unknown>
-            : resolvedValue instanceof Observable
-              ? resolvedValue
-              : of<unknown>(resolvedValue);
-
-        const data = await data$.pipe(take(1)).toPromise();
-
-        return {
-          factory,
-          data,
-        };
-      }
-
-      return { factory };
-    });
-
-    return Promise.all(resolved);
   }
 }
