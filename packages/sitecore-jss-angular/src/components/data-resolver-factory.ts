@@ -9,22 +9,24 @@ export function dataResolverFactory(
   activatedRoute: ActivatedRoute,
   router: Router
 ) {
-  function _getResolverInstance(resolver: Resolve<unknown> | Type<Resolve<unknown>>) {
+  function _getResolverInstance(resolver: Resolve<any> | Type<Resolve<any>>) {
     return 'resolve' in resolver ? resolver : injector.get(resolver);
   }
 
   function _collectResolverInstances(
     factory: ComponentFactoryResult
-  ): Array<[string, Resolve<unknown>]> {
+  ): Array<[string, Resolve<any>]> {
     if (factory.resolve != null) {
       const resolve = factory.resolve;
-      return Object.keys(factory.resolve).map((key) => [key, _getResolverInstance(resolve[key])]);
+      return Object.keys(factory.resolve).map(
+        (key): [string, Resolve<any>] => [key, _getResolverInstance(resolve[key])]
+      );
     }
 
     return [];
   }
 
-  function _resolveData(resolver: Resolve<unknown>) {
+  function _resolveData(resolver: Resolve<any>) {
     const data = resolver.resolve(activatedRoute.snapshot, router.routerState.snapshot);
     const data$ = wrapIntoObservable(data);
 
@@ -36,12 +38,12 @@ export function dataResolverFactory(
       factories.map((factory) => {
         const resolvers = _collectResolverInstances(factory);
         const pendingData = resolvers.map(([key, resolver]) =>
-          _resolveData(resolver).then((data): [string, unknown] => [key, data])
+          _resolveData(resolver).then((data): [string, any] => [key, data])
         );
 
         return Promise.all(pendingData)
           .then((allData) =>
-            allData.reduce<Record<string, unknown>>((acc, [key, data]) => {
+            allData.reduce<Record<string, any>>((acc, [key, data]) => {
               acc[key] = data;
               return acc;
             }, {})

@@ -8,7 +8,7 @@ export class ComponentNameAndType {
   type: Type<any>;
 
   canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
-  resolve?: { [key: string]: Resolve<unknown> | Type<Resolve<unknown>> };
+  resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
 }
 
 /** Registers a lazily loaded component by name and module to lazy load when it's needed */
@@ -21,7 +21,7 @@ export interface ComponentNameAndModule {
    */
   loadChildren: LoadChildren;
   canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
-  resolve?: { [key: string]: Resolve<unknown> | Type<Resolve<unknown>> };
+  resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
 }
 
 export function instanceOfComponentNameAndType(object: any): object is ComponentNameAndType {

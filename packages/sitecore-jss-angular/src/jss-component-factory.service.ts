@@ -28,7 +28,7 @@ export interface ComponentFactoryResult {
   componentDefinition: ComponentRendering | HtmlElementRendering;
   componentFactory?: ComponentFactory<any>;
   canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
-  resolve?: { [key: string]: Resolve<unknown> | Type<Resolve<unknown>> };
+  resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
 }
 
 @Injectable()
