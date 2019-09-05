@@ -1,3 +1,4 @@
+import { isPlatformServer } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
@@ -14,6 +15,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  PLATFORM_ID,
   Renderer2,
   SimpleChanges,
   Type,
@@ -30,10 +32,10 @@ import {
 } from '../jss-component-factory.service';
 import { PlaceholderLoadingDirective } from './placeholder-loading.directive';
 import {
-  DATA_RESOLVER,
   DataResolver,
-  GUARD_RESOLVER,
+  DATA_RESOLVER,
   GuardResolver,
+  GUARD_RESOLVER,
   PLACEHOLDER_MISSING_COMPONENT_COMPONENT,
 } from './placeholder.token';
 import { RenderEachDirective } from './render-each.directive';
@@ -75,6 +77,8 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   renderings?: Array<ComponentRendering | HtmlElementRendering>;
   @Input()
   outputs: { [k: string]: (eventType: any) => void };
+  @Input()
+  clientOnly = false;
 
   @Output()
   loaded = new EventEmitter<string | undefined>();
@@ -105,7 +109,8 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     private renderer: Renderer2,
     @Inject(PLACEHOLDER_MISSING_COMPONENT_COMPONENT) private missingComponentComponent: Type<any>,
     @Inject(GUARD_RESOLVER) private guardResolver: GuardResolver,
-    @Inject(DATA_RESOLVER) private dataResolver: DataResolver
+    @Inject(DATA_RESOLVER) private dataResolver: DataResolver,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
@@ -172,6 +177,10 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   }
 
   private async _render() {
+    if (this.clientOnly && isPlatformServer(this.platformId)) {
+      return;
+    }
+
     this._componentInstances = [];
     this.view.clear();
 
