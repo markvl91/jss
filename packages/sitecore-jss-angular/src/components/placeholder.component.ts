@@ -30,6 +30,8 @@ import {
 } from '../jss-component-factory.service';
 import { PlaceholderLoadingDirective } from './placeholder-loading.directive';
 import {
+  DATA_RESOLVER,
+  DataResolver,
   GUARD_RESOLVER,
   GuardResolver,
   PLACEHOLDER_MISSING_COMPONENT_COMPONENT,
@@ -102,7 +104,8 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     private elementRef: ElementRef,
     private renderer: Renderer2,
     @Inject(PLACEHOLDER_MISSING_COMPONENT_COMPONENT) private missingComponentComponent: Type<any>,
-    @Inject(GUARD_RESOLVER) private guardResolver: GuardResolver
+    @Inject(GUARD_RESOLVER) private guardResolver: GuardResolver,
+    @Inject(DATA_RESOLVER) private dataResolver: DataResolver
   ) {}
 
   ngOnInit() {
@@ -209,12 +212,13 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     } else {
       const factories = await this.componentFactory.getComponents(placeholder);
       const nonGuarded = await this.guardResolver(factories);
+      const withData = await this.dataResolver(nonGuarded);
 
-      nonGuarded.forEach((factory, index) => {
-        if (this.renderEachTemplate && !isRawRendering(factory.componentDefinition)) {
-          this._renderTemplatedComponent(factory.componentDefinition, index);
+      withData.forEach((rendering, index) => {
+        if (this.renderEachTemplate && !isRawRendering(rendering.factory.componentDefinition)) {
+          this._renderTemplatedComponent(rendering.factory.componentDefinition, index);
         } else {
-          this._renderEmbeddedComponent(factory, index);
+          this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
         }
       });
 
@@ -237,7 +241,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     });
   }
 
-  private _renderEmbeddedComponent(rendering: ComponentFactoryResult, index: number) {
+  private _renderEmbeddedComponent(rendering: ComponentFactoryResult, data: Data, index: number) {
     if (!rendering.componentImplementation) {
       const componentName = (rendering.componentDefinition as ComponentRendering).componentName;
       console.error(
@@ -268,6 +272,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
 
     const componentInstance = createdComponentRef.instance;
     componentInstance.rendering = rendering.componentDefinition;
+    componentInstance.data = data;
 
     if (this._inputs) {
       this._setComponentInputs(componentInstance, this._inputs);
