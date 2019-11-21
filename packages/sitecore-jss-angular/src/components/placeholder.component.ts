@@ -83,13 +83,13 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   @Output()
   loaded = new EventEmitter<string | undefined>();
 
-  @ViewChild('view', { read: ViewContainerRef })
+  @ViewChild('view', { read: ViewContainerRef, static: true })
   private view: ViewContainerRef;
-  @ContentChild(RenderEachDirective)
+  @ContentChild(RenderEachDirective, { static: true })
   renderEachTemplate: RenderEachDirective;
-  @ContentChild(RenderEmptyDirective)
+  @ContentChild(RenderEmptyDirective, { static: true })
   renderEmptyTemplate: RenderEmptyDirective;
-  @ContentChild(PlaceholderLoadingDirective)
+  @ContentChild(PlaceholderLoadingDirective, { static: true })
   placeholderLoading?: PlaceholderLoadingDirective;
 
   @Input()
@@ -158,7 +158,9 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
   }
 
   private _setComponentInputs(componentInstance: any, inputs: { [key: string]: any }) {
-    Object.keys(inputs).forEach((input) => (componentInstance[input] = inputs[input]));
+    Object.entries(inputs).forEach(
+      ([input, inputValue]) => (componentInstance[input] = inputValue)
+    );
   }
 
   private _subscribeComponentOutputs(

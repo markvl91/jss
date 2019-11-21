@@ -1,5 +1,5 @@
 import { InjectionToken, Type } from '@angular/core';
-import { CanActivate, Data, LoadChildren, Resolve } from '@angular/router';
+import { CanActivate, Data, Resolve } from '@angular/router';
 import { ComponentFactoryResult } from '../jss-component-factory.service';
 
 /** Registers a statically loaded component */
@@ -16,10 +16,10 @@ export interface ComponentNameAndModule {
   /** Name of the component */
   path: string;
   /**
-   * Module path that defines the component and export name,
-   * e.g. ./path/to/lazyloadedcomponent.module#LazyLoadedComponentModuleExportName
+   * Dynamic import of the component,
+   * e.g. () => import('./path/to/lazyloadedcomponent.module').then(m => m.LazyLoadedComponentModuleExportName)
    */
-  loadChildren: LoadChildren;
+  loadChildren: () => Promise<any>;
   canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
   resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
 }
