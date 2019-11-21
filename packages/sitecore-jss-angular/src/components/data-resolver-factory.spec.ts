@@ -1,17 +1,17 @@
 import { Injector } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Resolve, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { dataResolverFactory } from './data-resolver-factory';
-import { DataResolver, DATA_RESOLVER } from './placeholder.token';
+import { DataResolver, DATA_RESOLVER, JssResolve } from './placeholder.token';
 
-const mockSyncResolver: Resolve<string> = {
+const mockSyncResolver: JssResolve<string> = {
   resolve() {
     return 'Sync';
   },
 };
 
-class MockAsyncResolver implements Resolve<string> {
+class MockAsyncResolver implements JssResolve<string> {
   resolve() {
     return Promise.resolve('Async');
   }

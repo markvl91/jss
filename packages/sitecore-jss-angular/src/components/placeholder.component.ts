@@ -22,7 +22,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { Data } from '@angular/router';
+import { Data, UrlTree, Router } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
 import { Observable } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -107,6 +107,7 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
     private changeDetectorRef: ChangeDetectorRef,
     private elementRef: ElementRef,
     private renderer: Renderer2,
+    private router: Router,
     @Inject(PLACEHOLDER_MISSING_COMPONENT_COMPONENT) private missingComponentComponent: Type<any>,
     @Inject(GUARD_RESOLVER) private guardResolver: GuardResolver,
     @Inject(DATA_RESOLVER) private dataResolver: DataResolver,
@@ -222,20 +223,34 @@ export class PlaceholderComponent implements OnInit, OnChanges, DoCheck, OnDestr
       this.isLoading = false;
     } else {
       const factories = await this.componentFactory.getComponents(placeholder);
-      const nonGuarded = await this.guardResolver(factories);
-      const withData = await this.dataResolver(nonGuarded);
 
-      withData.forEach((rendering, index) => {
-        if (this.renderEachTemplate && !isRawRendering(rendering.factory.componentDefinition)) {
-          this._renderTemplatedComponent(rendering.factory.componentDefinition, index);
+      try {
+        const nonGuarded = await this.guardResolver(factories);
+        const withData = await this.dataResolver(nonGuarded);
+
+        withData.forEach((rendering, index) => {
+          if (this.renderEachTemplate && !isRawRendering(rendering.factory.componentDefinition)) {
+            this._renderTemplatedComponent(rendering.factory.componentDefinition, index);
+          } else {
+            this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
+          }
+        });
+
+        this.isLoading = false;
+        this.changeDetectorRef.markForCheck();
+        this.loaded.emit(this.name);
+      } catch (e) {
+        this.isLoading = false;
+        if (e instanceof UrlTree) {
+          this.router.navigateByUrl(e);
+        } else if (typeof e === 'string') {
+          this.router.navigate([e]);
+        } else if (Array.isArray(e)) {
+          this.router.navigate(e);
         } else {
-          this._renderEmbeddedComponent(rendering.factory, rendering.data, index);
+          throw e;
         }
-      });
-
-      this.isLoading = false;
-      this.changeDetectorRef.markForCheck();
-      this.loaded.emit(this.name);
+      }
     }
   }
 

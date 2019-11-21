@@ -61,15 +61,9 @@ export class LinkDirective implements OnChanges {
     const viewRef = this.viewContainer.createEmbeddedView(this.templateRef);
 
     viewRef.rootNodes.forEach((node) => {
-      Object.keys(props).forEach((key) => {
-        if (props[key] != null && props[key] !== '') {
-          if (key === 'class' && node.className !== '') {
-            this.renderer.setAttribute(node, key, `${node.className} ${props[key]}`);
-          } else {
-            this.renderer.setAttribute(node, key, props[key]);
-          }
-        }
-      });
+      Object.entries(props).forEach(([key, propValue]: [string, any]) =>
+        this.updateAttribute(node, key, propValue)
+      );
 
       if (node.childNodes && node.childNodes.length === 0 && linkText) {
         node.textContent = linkText;
@@ -87,15 +81,9 @@ export class LinkDirective implements OnChanges {
       ...this.getElementAttrs(),
       ...this.attrs,
     };
-    Object.keys(attrs).forEach((key) => {
-      if (attrs[key] != null && attrs[key] !== '') {
-        if (key === 'class' && span.className !== '') {
-          this.renderer.setAttribute(span, key, `${span.className} ${attrs[key]}`);
-        } else {
-          this.renderer.setAttribute(span, key, attrs[key]);
-        }
-      }
-    });
+    Object.entries(attrs).forEach(([key, attrValue]: [string, any]) =>
+      this.updateAttribute(span, key, attrValue)
+    );
 
     this.viewContainer.createEmbeddedView(this.templateRef);
 
@@ -106,10 +94,12 @@ export class LinkDirective implements OnChanges {
   }
 
   protected updateAttribute(node: any, key: string, prop: any) {
-    if (key === 'class' && node.className !== '') {
-      this.renderer.setAttribute(node, key, `${node.className} ${prop}`);
-    } else {
-      this.renderer.setAttribute(node, key, prop);
+    if (prop != null && prop !== '') {
+      if (key === 'class' && node.className !== '') {
+        this.renderer.setAttribute(node, key, `${node.className} ${prop}`);
+      } else {
+        this.renderer.setAttribute(node, key, prop);
+      }
     }
   }
 

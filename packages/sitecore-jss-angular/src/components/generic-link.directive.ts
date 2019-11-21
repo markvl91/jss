@@ -6,8 +6,8 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
+import { NavigationExtras, Router } from '@angular/router';
 import { isAbsoluteUrl } from '@sitecore-jss/sitecore-jss';
-import { Router, NavigationExtras } from '@angular/router';
 import { LinkDirective } from './link.directive';
 import { LinkField } from './rendering-field';
 
@@ -46,13 +46,13 @@ export class GenericLinkDirective extends LinkDirective {
       Object.entries(props).forEach(([key, propValue]: [string, any]) => {
         if (key === 'href' && !isAbsoluteUrl(propValue)) {
           const urlTree = this.router.createUrlTree([propValue], this.extras);
-          this.renderer.setAttribute(node, key, this.router.serializeUrl(urlTree));
+          this.updateAttribute(node, key, this.router.serializeUrl(urlTree));
           this.renderer.listen(node, 'click', (event) => {
             this.router.navigate([propValue], this.extras);
             event.preventDefault();
           });
         } else {
-          this.renderer.setAttribute(node, key, propValue);
+          this.updateAttribute(node, key, propValue);
         }
       });
 
