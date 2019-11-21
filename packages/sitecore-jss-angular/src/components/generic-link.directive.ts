@@ -1,22 +1,33 @@
-import { Directive, ElementRef, Input, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Input,
+  Renderer2,
+  TemplateRef,
+  ViewContainerRef,
+} from '@angular/core';
+import { isAbsoluteUrl } from '@sitecore-jss/sitecore-jss';
 import { Router, NavigationExtras } from '@angular/router';
 import { LinkDirective } from './link.directive';
 import { LinkField } from './rendering-field';
 
 @Directive({ selector: '[scGenericLink]' })
 export class GenericLinkDirective extends LinkDirective {
+  // tslint:disable-next-line:no-input-rename
+  @Input('scGenericLinkEditable')
+  editable = true;
 
   // tslint:disable-next-line:no-input-rename
-  @Input('scGenericLinkEditable') editable = true;
+  @Input('scGenericLinkAttrs')
+  attrs: any = {};
 
   // tslint:disable-next-line:no-input-rename
-  @Input('scGenericLinkAttrs') attrs: any = {};
+  @Input('scGenericLink')
+  field: LinkField;
 
   // tslint:disable-next-line:no-input-rename
-  @Input('scGenericLink') field: LinkField;
-
-  // tslint:disable-next-line:no-input-rename
-  @Input('scGenericLinkExtras') extras?: NavigationExtras;
+  @Input('scGenericLinkExtras')
+  extras?: NavigationExtras;
 
   constructor(
     viewContainer: ViewContainerRef,
@@ -33,7 +44,7 @@ export class GenericLinkDirective extends LinkDirective {
 
     viewRef.rootNodes.forEach((node) => {
       Object.entries(props).forEach(([key, propValue]: [string, any]) => {
-        if (key === 'href' && !this.isAbsoluteUrl(propValue)) {
+        if (key === 'href' && !isAbsoluteUrl(propValue)) {
           const urlTree = this.router.createUrlTree([propValue], this.extras);
           this.renderer.setAttribute(node, key, this.router.serializeUrl(urlTree));
           this.renderer.listen(node, 'click', (event) => {
@@ -49,16 +60,5 @@ export class GenericLinkDirective extends LinkDirective {
         node.textContent = linkText;
       }
     });
-  }
-
-  private isAbsoluteUrl(url?: string) {
-    if (url == null) {
-      return false;
-    }
-    if (typeof url !== 'string') {
-      throw new TypeError('Expected a string');
-    }
-
-    return /^[a-z][a-z0-9+.-]*:/.test(url);
   }
 }
