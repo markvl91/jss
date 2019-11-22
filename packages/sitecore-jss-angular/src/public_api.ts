@@ -8,6 +8,9 @@ export {
   ComponentNameAndType,
   DYNAMIC_COMPONENT,
   ComponentNameAndModule,
+  JssResolve,
+  JssCanActivate,
+  GuardInput,
 } from './components/placeholder.token';
 export { PlaceholderLoadingDirective } from './components/placeholder-loading.directive';
 export { isRawRendering } from './components/rendering';

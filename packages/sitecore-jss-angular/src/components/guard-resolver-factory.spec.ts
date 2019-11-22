@@ -1,38 +1,40 @@
+// tslint:disable: max-classes-per-file
+
 import { Injector } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, CanActivate } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { guardResolverFactory } from './guard-resolver-factory';
-import { GuardResolver, GUARD_RESOLVER } from './placeholder.token';
 import { Observable, of } from 'rxjs';
+import { guardResolverFactory } from './guard-resolver-factory';
+import { GUARD_RESOLVER, GuardResolver, JssCanActivate } from './placeholder.token';
 
 const createLiteralGuard = (
   canActivate: boolean | Promise<boolean> | Observable<boolean>
-): CanActivate => ({
+): JssCanActivate => ({
   canActivate() {
     return canActivate;
   },
 });
 
-class MockSyncTrueGuard implements CanActivate {
+class MockSyncTrueGuard implements JssCanActivate {
   canActivate() {
     return true;
   }
 }
 
-class MockSyncFalseGuard implements CanActivate {
+class MockSyncFalseGuard implements JssCanActivate {
   canActivate() {
     return false;
   }
 }
 
-class MockAsyncTrueGuard implements CanActivate {
+class MockAsyncTrueGuard implements JssCanActivate {
   canActivate() {
     return Promise.resolve(true);
   }
 }
 
-class MockAsyncFalseGuard implements CanActivate {
+class MockAsyncFalseGuard implements JssCanActivate {
   canActivate() {
     return of(false);
   }

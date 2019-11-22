@@ -8,7 +8,7 @@ import {
   NgModuleFactoryLoader,
   Type,
 } from '@angular/core';
-import { CanActivate, LoadChildren, Resolve } from '@angular/router';
+import { LoadChildren } from '@angular/router';
 import { ComponentRendering, HtmlElementRendering } from '@sitecore-jss/sitecore-jss';
 import { from, of } from 'rxjs';
 import { mergeMap, take } from 'rxjs/operators';
@@ -16,6 +16,8 @@ import {
   ComponentNameAndModule,
   ComponentNameAndType,
   DYNAMIC_COMPONENT,
+  JssCanActivate,
+  JssResolve,
   PLACEHOLDER_COMPONENTS,
   PLACEHOLDER_LAZY_COMPONENTS,
 } from './components/placeholder.token';
@@ -27,8 +29,11 @@ export interface ComponentFactoryResult {
   componentImplementation?: Type<any>;
   componentDefinition: ComponentRendering | HtmlElementRendering;
   componentFactory?: ComponentFactory<any>;
-  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
-  resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
+  canActivate?:
+    | JssCanActivate
+    | Type<JssCanActivate>
+    | Array<JssCanActivate | Type<JssCanActivate>>;
+  resolve?: { [key: string]: JssResolve<any> | Type<JssResolve<any>> };
 }
 
 @Injectable()

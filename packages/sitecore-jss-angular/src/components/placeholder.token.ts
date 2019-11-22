@@ -1,14 +1,25 @@
 import { InjectionToken, Type } from '@angular/core';
-import { CanActivate, Data, Resolve } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  Data,
+  Resolve,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
+import { Observable } from 'rxjs';
 import { ComponentFactoryResult } from '../jss-component-factory.service';
+import { ComponentRendering } from '../public_api';
 
 /** Registers a statically loaded component */
 export class ComponentNameAndType {
   name: string;
   type: Type<any>;
 
-  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
-  resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
+  canActivate?:
+    | JssCanActivate
+    | Type<JssCanActivate>
+    | Array<JssCanActivate | Type<JssCanActivate>>;
+  resolve?: { [key: string]: JssResolve<any> | Type<JssResolve<any>> };
 }
 
 /** Registers a lazily loaded component by name and module to lazy load when it's needed */
@@ -20,7 +31,10 @@ export interface ComponentNameAndModule {
    * e.g. () => import('./path/to/lazyloadedcomponent.module').then(m => m.LazyLoadedComponentModuleExportName)
    */
   loadChildren: () => Promise<any>;
-  canActivate?: CanActivate | Type<CanActivate> | Array<CanActivate | Type<CanActivate>>;
+  canActivate?:
+    | JssCanActivate
+    | Type<JssCanActivate>
+    | Array<JssCanActivate | Type<JssCanActivate>>;
   resolve?: { [key: string]: Resolve<any> | Type<Resolve<any>> };
 }
 
@@ -54,3 +68,25 @@ export type DataResolver = (
 ) => Promise<Array<{ factory: ComponentFactoryResult; data: Data }>>;
 
 export const DATA_RESOLVER = new InjectionToken<DataResolver>('Sc.placeholder.dataResolver');
+
+export interface GuardInput {
+  activatedRoute: ActivatedRouteSnapshot;
+  routerState: RouterStateSnapshot;
+  rendering: ComponentRendering;
+}
+
+export interface JssCanActivate {
+  canActivate(
+    input: GuardInput
+  ):
+    | Observable<boolean | UrlTree | string | string[]>
+    | Promise<boolean | UrlTree | string | string[]>
+    | boolean
+    | UrlTree
+    | string
+    | string[];
+}
+
+export interface JssResolve<T> {
+  resolve(input: GuardInput): Observable<T> | Promise<T> | T;
+}
