@@ -31,7 +31,7 @@ export class GenericRichTextDirective implements OnChanges {
     private templateRef: TemplateRef<any>,
     private renderer: Renderer2,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['field'] || changes['editable']) {
@@ -53,7 +53,7 @@ export class GenericRichTextDirective implements OnChanges {
     const html = field.editable && this.editable ? field.editable : field.value;
     this.viewRef.rootNodes.forEach((node) => {
       node.innerHTML = html;
-      if (node.querySelectorAll != null) {
+      if(node.querySelectorAll != null) {
         const links: NodeListOf<HTMLLinkElement> = node.querySelectorAll('a[href]');
         const linksArray: Array<HTMLLinkElement> = [].slice.call(links);
 
