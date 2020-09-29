@@ -102,6 +102,8 @@ To configure the Sitecore connection, run `jss setup` at a command line within y
 
 * **'Website' folder**: This is the root physical path to the Sitecore instance, used to deploy config files and JS build artifacts. File share paths are fine for remote instances. Example: `c:\inetpub\wwwroot\MySitecore\Website`. If you do not have access to the website folder directly, answer 'no' when asked if your instance is remote.
 * **Sitecore host name**. This is the _host name of your JSS app_ (not the Sitecore root host name), which was configured previously. Example: `http://jssreactweb`
+* **Sitecore import service URL**. This is the _import service URL of your JSS app_, by default it will сonsist of _host name of your JSS app_
+plus `/sitecore/api/jss/import`: `http://JssReactWeb/sitecore/api/jss/import`. You can left blank value and default value will be set, in another case you can provide your custom URL.
 * **API key ID** created above.
 * **Deployment secret**. This is a shared secret that enables authentication to deploy your app's items to Sitecore. The setup process can auto-generate a random key, which we recommend. If you choose your own key, the secret must be:
     * 32 or more characters long
@@ -144,7 +146,14 @@ Now we are all ready to deploy our JSS app to the Sitecore instance.
 
 If your Sitecore instance is local, or accessible via file share, you can use the CLI for an automated deployment. Skip to 3.2 for a remote instance.
 
-1. Open a command prompt/terminal within your JSS app
+If you are using local self-signed certificate:
+  1. Open a command prompt/terminal within your JSS app. If you know certificate value skip to step 4.
+  1. Run command using wrong certificate thumbprint `jss deploy app --includeContent --includeDictionary --acceptCertificate test`
+  1. From error message copy certificate thumbprint and paste instead of `test`
+  <img src="/assets/img/certificate-error.png" alt="Certificate error" class="img-fluid img-thumbnail" />
+  1. `jss deploy app --includeContent --includeDictionary --acceptCertificate CA:CD:3B:DB:19:D1:97:92:F9:80:91:FF:32:CC:F8:35:DC:F5:0B:01`
+
+If you are not using local self-signed certificate:
 1. `jss deploy app --includeContent --includeDictionary`
 
 This will:
@@ -153,6 +162,8 @@ This will:
 - Generate a JSS manifest package that contains your app manifest and referenced media files
 - Install the package over HTTP(S) on your Sitecore instance.
 - Copy build artifacts to the Sitecore website folder
+
+> `--acceptCertificate` parameter whitelists an SSL certificate by thumbprint (certificate pinning). Because Node does not respect Windows trusted root certificates, this enables deploying items to local Sitecore instances that use self-signed certificates without disabling SSL validation entirely.
 
 > There are many available options for `jss deploy app`, which are all set to sensible defaults if unspecified. You can see all of the options for it using `jss deploy app --help`. 
 

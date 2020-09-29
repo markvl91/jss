@@ -5,6 +5,173 @@ title: Release Notes
 ---
 # Release Notes
 
+## Sitecore JSS 14.0.1
+
+### Bug Fixes
+
+* [Commit](https://github.com/Sitecore/jss/commit/a79edbadd04d50cf4ba88ac62836b26be90c8ac0) [Doc] Describe that global styles, scripts can't be inserted when a component is added to a route in Experience Editor
+* [PR #396](https://github.com/Sitecore/jss/pull/396) [Doc] Update tracking doc as it had a link that 404'ed
+* [PR #355](https://github.com/Sitecore/jss/pull/355) [Doc] Add rendering host documentation
+* [PR #394](https://github.com/Sitecore/jss/pull/394) [React sample rendering-host] Setup in order to run rendering host script
+* [Commit](https://github.com/Sitecore/jss/commit/64545fa7537ab1d84b60cdfb4a77130c248d9ed7) [React sample] Cannot read property 'fields' of undefined
+* [Commit](https://github.com/Sitecore/jss/commit/c28df0d5623bc00a037e52a13fbff86a67bf497e) [React sample] Fix dev dependencies versions
+
+## Sitecore JSS 14.0 for Sitecore 10
+
+### Upgrading
+
+There are [migration instructions](/upgrade-guides/14.0) from JSS 13-based applications.
+
+### New Features & Improvements
+
+* [PR #347](https://github.com/Sitecore/jss/pull/347) Fixes withSitecoreContext typescript definition
+* [PR #350](https://github.com/Sitecore/jss/pull/350) The types of the render functions in the Placeholder component props are not correct or missing
+
+SXA and Sitecore Forms compatibility table
+| Sitecore  | JSS      | SXA   | Forms
+| --------- | -------- |------ | ------
+| 10        | 14.0     | 10    | Yes
+| 9.3       | 13.1     | 9.3   | Yes
+| 9.3       | 13.0     | 9.3   | Yes
+| 9.2       | 12.0     | 1.9   | Yes
+| 9.1.1     | 11.1     | 1.9   | No
+| 9.1       | 11.0     | No    | No
+| 9.0       | 11.0     | No    | No
+
+## Sitecore JSS 13.2 for Sitecore 9.3
+
+### New Features & Improvements
+
+* [PR #357](https://github.com/Sitecore/jss/pull/392) [Forms] Implement FileUpload field
+* [Commit](https://github.com/Sitecore/jss/commit/097f734568bc81585c3c9612b571c83165614442) [Doc][Form] Document how to customize FormFetcher of the <Form> component
+
+### Bug Fixes
+
+* [PR #381](https://github.com/Sitecore/jss/pull/381) [Doc] Minor formatting fix in JSS Server Setup documentation
+* [PR #388](https://github.com/Sitecore/jss/pull/388) [Doc][node-headless-ssr-proxy sample] - Fix broken Headless SSR mode link
+
+## Sitecore JSS 13.1 for Sitecore 9.3
+
+### New Features & Improvements
+
+* [PR #357](https://github.com/Sitecore/jss/pull/357) [Doc] Updated context extension docs around caching
+* [Commit](https://github.com/Sitecore/jss/commit/b0415c08f469a8dface7f43e2b24e53dd35f3577) [Doc] Extend JSS Forms documentation regarding customizing labels of different field types
+* [Commit](https://github.com/Sitecore/jss/commit/749d836291ffaaff9631596e3e2dd37361918bd6) Add --skipValidation for `jss setup` command
+* [PR #338](https://github.com/Sitecore/jss/pull/338) Section field template can use FormFieldSection in order to pass cssClass to the fieldset element and be able to customize the styles for it.
+* [PR #346](https://github.com/Sitecore/jss/pull/346) Responsive image srcset fallback with src output
+* [PR #303](https://github.com/Sitecore/jss/pull/303) [React-Native sample] documentation is improved and extended.
+
+### Bug Fixes
+
+* [PR #373](https://github.com/Sitecore/jss/pull/373) [Vue Sample] Fix route changes with path and a hash
+* [Bug #141](https://github.com/Sitecore/jss/issues/141) Cannot add components to placeholder without saving first
+* [PR #374](https://github.com/Sitecore/jss/pull/374) [React sample] Fixed start:connected-ssr npm script
+* [Commit](https://github.com/Sitecore/jss/commit/d6a5431ebaa4a2c288db83a986b069710a353b83) [Doc] Sitecore Forms + JSS article doesn't mention that the provided sample doesn't work for Headless mode
+* [Bug #348](https://github.com/Sitecore/jss/issues/348) Publishing configuration for sitecore-jss-angular gives errors for Angular 9 ngcc
+* [Commit](https://github.com/Sitecore/jss/commit/a1f323768506ccf1ec92d7c6bb6f2990c2de0ae7) [React sample] 'deploy template' does not accept --acceptCertificate
+* [Bug #358](https://github.com/Sitecore/jss/pull/358) [Vue sample] SSR - fixed hydration bailouts
+* [Bug #360](https://github.com/Sitecore/jss/issues/360) Quick Start with vue is failing
+* [Bug #363](https://github.com/Sitecore/jss/issues/363) Wrong Type Definition for ItemLink
+* [Bug #328](https://github.com/Sitecore/jss/issues/328) Item Links failing to find reference with disconnected mode
+* [PR #341](https://github.com/Sitecore/jss/issues/341) `jss setup` does not work with Sitecore Docker
+* [PR #359](https://github.com/Sitecore/jss/pull/359) Add description of import service URL question
+* [PR #356](https://github.com/Sitecore/jss/pull/356) [Doc] Fix broken react-native link on homepage
+* [Bug #299](https://github.com/Sitecore/jss/issues/299) SitecoreContextReactContext.Provider is not working properly, because value never changes as it is always same class instance
+* [Bug #333](https://github.com/Sitecore/jss/issues/333) [Doc] Document addPlaceholder function
+* [PR #353](https://github.com/Sitecore/jss/pull/353) [Doc] Move Forms installation documentation section above sample implementation
+* [PR #351](https://github.com/Sitecore/jss/pull/351) [React sample] Include polyfills for IE11
+* [Bug #257](https://github.com/Sitecore/jss/issues/257) [Doc] Add doc for `--acceptCertificate` param
+* [Bug #336](https://github.com/Sitecore/jss/issues/336) [Vue sample] CLI deploy options do not trigger build step
+* [PR #337](https://github.com/Sitecore/jss/pull/337) [Vue sample] set i18n initial language based on SSR language
+* [PR #335](https://github.com/Sitecore/jss/pull/335) Vue sample Specimen component updated with correct implementation path
+* [Bug #287](https://github.com/Sitecore/jss/issues/287) Potential memory leak in React SitecoreContextFactory
+* [PR #300](https://github.com/Sitecore/jss/pull/330) [React sample] set i18n init lang to prevent SSR hydration from re-rendering app
+* [Commit](https://github.com/Sitecore/jss/commit/6ee8a40c3979408032c0de3fa16bb9cae55037e4) react app - Cannot read property 'forEach' of undefined
+* [Bug #314](https://github.com/Sitecore/jss/issues/314) Angular scaffolding has error in polyfill.ts
+* [Bug #311](https://github.com/Sitecore/jss/issues/311) [React sample] npm run eject throws error
+* [PR #281](https://github.com/Sitecore/jss/pull/281) Wrong GraphQLEndpoint assembly name
+* [PR #302](https://github.com/Sitecore/jss/pull/302) Correctly evaluates the value of `SITECORE_ENABLE_DEBUG` variable
+* [PR #285](https://github.com/Sitecore/jss/pull/285) [Commit](https://github.com/Sitecore/jss/commit/4385791240447ad3cbf8582ca7ace76e7dfcb241) Include media from Droptree and Multilist content
+* [PR #306](https://github.com/Sitecore/jss/pull/306) [Doc] Docs missing configuration of fetcher
+
+SXA and Sitecore Forms compatibility table
+| Sitecore  | JSS      | SXA   | Forms
+| --------- | -------- |------ | ------
+| 9.3       | 13.1     | 9.3   | Yes
+| 9.3       | 13.0     | 9.3   | Yes
+| 9.2       | 12.0     | 1.9   | Yes
+| 9.1.1     | 11.1     | 1.9   | No
+| 9.1       | 11.0     | No    | No
+| 9.0       | 11.0     | No    | No
+
+## Sitecore JSS 13.0 for Sitecore 9.3
+
+### Upgrading
+
+There are [migration instructions](/upgrade-guides/13.0) from JSS 12-based applications.
+
+### New Features & Improvements
+
+* JSS Rendering host
+* 
+    Updated:
+    * React: from 16.3.0 to 16.12.0,
+    * Angular: from 7.0 to 8.2.8,
+    * Vue: from 2.5.17 to 2.6.10
+    * React-Native: 0.55.4 to 0.60.5
+
+    and all their dependencies has been updated to their latest versions ([#252](https://github.com/Sitecore/jss/pull/252), [#255](https://github.com/Sitecore/jss/pull/255), [#256](https://github.com/Sitecore/jss/pull/256), [#266](https://github.com/Sitecore/jss/pull/266), [#269](https://github.com/Sitecore/jss/pull/269), [#282](https://github.com/Sitecore/jss/pull/282))
+* New React Native sample app added (implemented similarly to existing Styleguide sample apps)
+* Documentation updates
+
+### Bug Fixes
+* [Bug #224](https://github.com/Sitecore/jss/issues/224) Export SitecoreContextReactContext
+* [Pull #223](https://github.com/Sitecore/jss/pull/223) Allow lazy loaded components to show a loading state
+* [Pull #224](https://github.com/Sitecore/jss/pull/191) Allow Scoped Styles to Work With Child Components
+* [Bug #61](https://github.com/Sitecore/jss/issues/61) Nested component definitions via Item Link returns only IDs
+* [Pull #146](https://github.com/Sitecore/jss/pull/146) Added support for TypeScript when jss build'ing
+* [Bug #267](https://github.com/Sitecore/jss/issues/267) Error in description of one of methods of Manifest interface
+* [Bug #220](https://github.com/Sitecore/jss/issues/220) Use Object.entries instead of Object.keys
+* [Bug #172](https://github.com/Sitecore/jss/issues/172) mediaApi.updateImageUrl loses revision querystring
+* [Bug #189](https://github.com/Sitecore/jss/issues/189) DevTools loading hidden files and crashing
+* [Bug #160](https://github.com/Sitecore/jss/issues/160) Node Proxy: CURL URL -IL returns 500 OK
+
+### Breaking Changes
+
+* React sample
+	* Upgraded react-i18next: Migration guide https://react.i18next.com/latest/migrating-v9-to-v10
+* React-Native sample
+	* `getRouteData` function interface is changed. Now it accepts two params: `(route, { options, language })`
+* Angular sample
+	* Lazy loading syntax is changed: https://angular.io/guide/deprecations#loadchildren-string-syntax
+	* tsconfig.app.json and tsconfig.json: set "module": "commonjs", because `dynamic import` approach requires this module type
+	* Typescript 3.5 breaking changes: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#typescript-35
+* sitecore-jss-angular package
+	* ng-packagr: option workingDirectory is removed, removed corresponding getter from NgPackage class. (https://github.com/ng-packagr/ng-packagr/blob/master/CHANGELOG.md#breaking-changes-5)
+	* Setting ngPackage.src has no effect any more. The source directory (base path) is equivalent to the location of the (primary) ng-package.json, package.json, or ng-package.js. (https://github.com/ng-packagr/ng-packagr/blob/master/CHANGELOG.md#breaking-changes-6)
+	* The setting for external dependencies (lib.externals) has been removed in favour of lib.umdModuleIds which is now just used to provide the UMD module identifiers of external dependencies. (https://github.com/ng-packagr/ng-packagr/blob/master/CHANGELOG.md#migrating-from-v1-breaking-changes-from-v160-to-v200)
+	* @angular/core: Default setting for @ViewChild and @ContentChild queries is changed (https://angular.io/guide/static-query-migration#should-i-use-static-true) ComponentNameAndModule interface is changed accordingly to new lazy loading syntax: https://angular.io/guide/deprecations#loadchildren-string-syntax 
+* sitecore-jss-cli package
+	yargs: CommandModule interface is changed https://github.com/Sitecore/jss/pull/272/files#diff-e0b90a991107a0e06b6fa1bb626b6d5eR25
+
+SXA and Sitecore Forms compatibility table
+| Sitecore  | JSS      | SXA   | Forms
+| --------- | -------- |------ | ------ 
+| 9.3       | 13.0     | 9.3   | Yes
+| 9.2       | 12.0     | 1.9   | Yes
+| 9.1.1     | 11.1     | 1.9   | No
+| 9.1       | 11.0     | No    | No
+| 9.0       | 11.0     | No    | No
+
+## Sitecore JSS 12.0.1 for Sitecore 9.2
+
+### Upgrading
+
+No special upgrade steps needed, it's safe to promote to newer version.
+
+### Bug Fixes
+* [Bug #324](https://github.com/Sitecore/jss/issues/324) Sitecore jss + proxy has degrading performance in amount of requests served per second
+
 ## Sitecore JSS 12.0 for Sitecore 9.2
 
 ### Upgrading
@@ -30,7 +197,14 @@ SXA and Sitecore Forms compatibility table
 | 9.1       | 11.0     | No    | No
 | 9.0       | 11.0     | No    | No
 
+## Sitecore JSS 11.0.3 for Sitecore 9.1.1
 
+### Upgrading
+
+No special upgrade steps needed, it's safe to promote to newer version.
+
+### Bug Fixes
+* [Bug #324](https://github.com/Sitecore/jss/issues/324) Sitecore jss + proxy has degrading performance in amount of requests served per second
 
 ## Sitecore JSS 11.1 for Sitecore 9.1.1
 

@@ -1,8 +1,10 @@
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoot from './AppRoot';
-import { setServerSideRenderingState } from './RouteHandler';
 import GraphQLClientFactory from './lib/GraphQLClientFactory';
 import config from './temp/config';
 import i18ninit from './i18n';
@@ -10,6 +12,8 @@ import i18ninit from './i18n';
 /* eslint-disable no-underscore-dangle */
 
 let renderFunction = ReactDOM.render;
+
+let initLanguage = config.defaultLanguage;
 
 /*
   SSR Data
@@ -30,11 +34,11 @@ if (ssrRawJson) {
   __JSS_STATE__ = JSON.parse(ssrRawJson.innerHTML);
 }
 if (__JSS_STATE__) {
-  // push the initial SSR state into the route handler, where it will be used
-  setServerSideRenderingState(__JSS_STATE__);
-
   // when React initializes from a SSR-based initial state, you need to render with `hydrate` instead of `render`
   renderFunction = ReactDOM.hydrate;
+
+  // set i18n language SSR state language instead of static config default language
+  initLanguage = __JSS_STATE__.sitecore.context.language;
 }
 
 /*
@@ -54,7 +58,7 @@ const graphQLClient = GraphQLClientFactory(config.graphQLEndpoint, false, initia
 */
 // initialize the dictionary, then render the app
 // note: if not making a multlingual app, the dictionary init can be removed.
-i18ninit().then(() => {
+i18ninit(initLanguage).then(() => {
   // HTML element to place the app into
   const rootElement = document.getElementById('root');
 
@@ -63,6 +67,7 @@ i18ninit().then(() => {
       path={window.location.pathname}
       Router={BrowserRouter}
       graphQLClient={graphQLClient}
+      ssrState={__JSS_STATE__}
     />,
     rootElement
   );
