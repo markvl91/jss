@@ -59,8 +59,9 @@ export class GenericRichTextDirective implements OnChanges {
 
         linksArray.forEach((link) => {
           const href = link.getAttribute('href');
-
-          if (href != null && !isAbsoluteUrl(href)) {
+          const target = link.getAttribute('target');
+          
+          if (href != null && !isAbsoluteUrl(href) && target !== '_blank' && target !== '_top') {
             this.renderer.listen(link, 'click', (event) => {
               this.router.navigateByUrl(href);
               event.preventDefault();
